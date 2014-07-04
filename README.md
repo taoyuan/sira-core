@@ -1,0 +1,4 @@
+sira-core
+=========
+
+Sira core.
