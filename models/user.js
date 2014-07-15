@@ -16,6 +16,8 @@ module.exports = {
             'Challenge' // Security questions/answers
         ],
         status: String,
+
+        // Timestamps
         created: {type: Date, default: function () { return new Date;}},
         updated: {type: Date, default: function () { return new Date;}}
     },

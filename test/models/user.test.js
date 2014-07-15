@@ -1,7 +1,7 @@
 "use strict";
 
 var sira = require('sira');
-var s = require('./support');
+var s = require('./../support');
 var t = s.t;
 var async = require('async');
 

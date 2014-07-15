@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "bcryptjs": "^1.0.5",
+    "crypto": "0.0.3",
     "lodash": "^2.4.1",
     "uid2": "0.0.3",
     "validator": "^3.16.0"
