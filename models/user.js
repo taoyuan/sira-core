@@ -1,5 +1,7 @@
 "use strict";
 
+var SEC = require('../').security;
+
 module.exports = {
     properties: {
         realm: {type: String},
@@ -27,5 +29,56 @@ module.exports = {
             model: 'AccessToken',
             foreignKey: 'userId'
         }
+    },
+    settings: {
+        acls: [
+            {
+                principalType: SEC.ROLE,
+                principalId: SEC.EVERYONE,
+                permission: SEC.DENY
+            },
+            {
+                principalType: SEC.ROLE,
+                principalId: SEC.EVERYONE,
+                permission: SEC.ALLOW,
+                property: 'create'
+            },
+            {
+                principalType: SEC.ROLE,
+                principalId: SEC.OWNER,
+                permission: SEC.ALLOW,
+                property: 'removeById'
+            },
+            {
+                principalType: SEC.ROLE,
+                principalId: SEC.EVERYONE,
+                permission: SEC.ALLOW,
+                property: "login"
+            },
+            {
+                principalType: SEC.ROLE,
+                principalId: SEC.EVERYONE,
+                permission: SEC.ALLOW,
+                property: "logout"
+            },
+            {
+                principalType: SEC.ROLE,
+                principalId: SEC.OWNER,
+                permission: SEC.ALLOW,
+                property: "findById"
+            },
+            {
+                principalType: SEC.ROLE,
+                principalId: SEC.OWNER,
+                permission: SEC.ALLOW,
+                property: "updateAttributes"
+            },
+            {
+                principalType: SEC.ROLE,
+                principalId: SEC.EVERYONE,
+                permission: SEC.ALLOW,
+                property: "confirm"
+            }
+        ]
     }
 };

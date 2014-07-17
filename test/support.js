@@ -4,7 +4,15 @@ var sira = require('sira');
 var chai = exports.chai = require('chai');
 chai.config.includeStack = true;
 
+var authorizer = require('../').authorizer;
+
 var t = exports.t = chai.assert;
+
+t.plan = function (count, done) {
+    return function () {
+        if (--count === 0) done();
+    }
+};
 
 exports.bootApp = function (options, done) {
     if (typeof options === "function") {
@@ -13,7 +21,7 @@ exports.bootApp = function (options, done) {
     }
     options = options || {};
     options.db = options.db || {
-        driver: 'redis-hq'
+        driver: 'memory'//'redis-hq'
     };
 
     var app = new sira.Application;
@@ -22,8 +30,12 @@ exports.bootApp = function (options, done) {
     app.phase(function () {
         app.use(app.dispatcher);
     });
-    app.boot(function (err) {
-        done(err, app);
+    app.phase(authorizer);
+    process.nextTick(function () {
+        app.boot(function (err) {
+            done(err, app);
+        });
     });
+
     return app;
 };

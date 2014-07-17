@@ -1,5 +1,6 @@
 "use strict";
 
+var sira = require('sira');
 var validator = require('validator');
 var bcrypt = require('bcryptjs');
 
@@ -9,6 +10,59 @@ var DEFAULT_RESET_PW_TTL = 15 * 60 ;// 15 mins in seconds
 var DEFAULT_MAX_TTL = 31556926; // 1 year in second
 
 module.exports = function (User, app) {
+    var ACL = app.model('ACL');
+    var Role = app.model('Role');
+
+    User.settings.acls = [
+        {
+            principalType: ACL.ROLE,
+            principalId: Role.EVERYONE,
+            permission: ACL.DENY
+        },
+        {
+            principalType: ACL.ROLE,
+            principalId: Role.EVERYONE,
+            permission: ACL.ALLOW,
+            property: 'create'
+        },
+        {
+            principalType: ACL.ROLE,
+            principalId: Role.OWNER,
+            permission: ACL.ALLOW,
+            property: 'removeById'
+        },
+        {
+            principalType: ACL.ROLE,
+            principalId: Role.EVERYONE,
+            permission: ACL.ALLOW,
+            property: "login"
+        },
+        {
+            principalType: ACL.ROLE,
+            principalId: Role.EVERYONE,
+            permission: ACL.ALLOW,
+            property: "logout"
+        },
+        {
+            principalType: ACL.ROLE,
+            principalId: Role.OWNER,
+            permission: ACL.ALLOW,
+            property: "findById"
+        },
+        {
+            principalType: ACL.ROLE,
+            principalId: Role.OWNER,
+            permission: ACL.ALLOW,
+            property: "updateAttributes"
+        },
+        {
+            principalType: ACL.ROLE,
+            principalId: Role.EVERYONE,
+            permission: ACL.ALLOW,
+            property: "confirm"
+        }
+    ];
+
 
     // max ttl
     User.settings.maxTTL = User.settings.maxTTL || DEFAULT_MAX_TTL;
@@ -183,6 +237,46 @@ module.exports = function (User, app) {
             cb(err);
         }
     };
+
+    sira.expose(User.login, {
+        accepts: [
+            {arg: 'credentials', type: 'object', required: true, source: 'payload'}
+        ],
+        returns: {
+            arg: 'accessToken', type: 'object', root: true, description:
+                'The result AccessToken created on login.\n\n'
+        },
+        http: {verb: 'post'}
+    });
+
+    sira.expose(User.logout, {
+        accepts: [
+            {arg: 'access_token', type: 'string', required: true, source: function(ctx) {
+                var req = ctx && ctx.request;
+                var accessToken = req && (req.accessToken || req.token);
+                return accessToken && accessToken.id;
+            }, description:
+                'Do not supply this argument, it is automatically extracted ' +
+                'from request.'
+            }
+        ],
+        http: {verb: 'all'}
+    });
+
+//    sira.expose(User.confirm, {
+//        accepts: [
+//            {arg: 'uid', type: 'string', required: true},
+//            {arg: 'token', type: 'string', required: true}
+//        ],
+//        http: {verb: 'get', path: '/confirm'}
+//    });
+
+    sira.expose(User.resetPassword, {
+        accepts: [
+            {arg: 'options', type: 'object', required: true, source: 'payload'}
+        ],
+        http: {verb: 'post', path: '/reset'}
+    });
 
 };
 

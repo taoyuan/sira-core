@@ -1,10 +1,9 @@
 "use strict";
 
-var sira = require('sira');
 var s = require('./../support');
 var t = s.t;
 
-describe.only('Application', function () {
+describe('Application', function () {
     var registeredApp = null;
 
     var Application;
