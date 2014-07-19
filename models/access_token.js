@@ -7,7 +7,7 @@ module.exports = {
     properties: {
         id: { type: String },
         ttl: { type: Number, default: DEFAULT_TTL },
-        created: { type: Date, default: Date.now }
+        created: {type: Date, default: function () { return new Date;}}
     },
     relations: {
         user: {

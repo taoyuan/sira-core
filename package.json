@@ -19,10 +19,14 @@
   "devDependencies": {
     "async": "^0.9.0",
     "chai": "^1.9.1",
+    "cookie-parser": "^1.3.2",
+    "express": "^4.6.1",
     "jugglingdb": "^0.2.14",
     "jugglingdb-redis-hq": "0.0.10",
     "mocha": "^1.20.1",
-    "sira": "taoyuan/sira"
+    "sira": "taoyuan/sira",
+    "sira-connect-token": "git://github.com/taoyuan/sira-connect-token",
+    "supertest": "^0.13.0"
   },
   "dependencies": {
     "bcryptjs": "^1.0.5",

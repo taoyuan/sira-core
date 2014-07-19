@@ -6,9 +6,9 @@ var t = s.t;
 
 describe('boot', function () {
 
-    it('should load component resources', function (done) {
+    it('should load module resources', function (done) {
         var app = new sira.Application;
-        app.phase(sira.boot.component('./'));
+        app.phase(sira.boot.module('./'));
         app.phase(sira.boot.database());
         app.boot(function (err) {
             t(app.models.User);

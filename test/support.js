@@ -24,18 +24,39 @@ exports.bootApp = function (options, done) {
         driver: 'memory'//'redis-hq'
     };
 
-    var app = new sira.Application;
-    app.phase(sira.boot.component('./'));
-    app.phase(sira.boot.database(options.db));
-    app.phase(function () {
-        app.use(app.dispatcher);
+    var sapp = new sira.Application;
+    sapp.phase(sira.boot.module('./'));
+    sapp.phase(sira.boot.database(options.db));
+    sapp.phase(function () {
+        sapp.use(sapp.dispatcher);
     });
-    app.phase(authorizer);
-    process.nextTick(function () {
-        app.boot(function (err) {
-            done(err, app);
-        });
-    });
+    sapp.phase(authorizer);
 
-    return app;
+    if (options.beforeBoot) {
+        options.beforeBoot(sapp);
+    }
+
+    if (options.sync) {
+        sapp.boot(options, function (err) {
+            done(err, sapp);
+        });
+    } else {
+        process.nextTick(function () {
+            sapp.boot(options, function (err) {
+                done(err, sapp);
+            });
+        });
+    }
+
+    return sapp;
+};
+
+exports.bootAppSync = function (options, done) {
+    if (typeof options === "function") {
+        done = options;
+        options = null;
+    }
+    options = options || {};
+    options.sync = true;
+    return exports.bootApp(options, done);
 };
