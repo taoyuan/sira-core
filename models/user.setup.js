@@ -1,6 +1,5 @@
 "use strict";
 
-var sira = require('sira');
 var validator = require('validator');
 var bcrypt = require('bcryptjs');
 
@@ -12,57 +11,6 @@ var DEFAULT_MAX_TTL = 31556926; // 1 year in second
 module.exports = function (User, app) {
     var ACL = app.model('ACL');
     var Role = app.model('Role');
-
-    User.settings.acls = [
-        {
-            principalType: ACL.ROLE,
-            principalId: Role.EVERYONE,
-            permission: ACL.DENY
-        },
-        {
-            principalType: ACL.ROLE,
-            principalId: Role.EVERYONE,
-            permission: ACL.ALLOW,
-            property: 'create'
-        },
-        {
-            principalType: ACL.ROLE,
-            principalId: Role.OWNER,
-            permission: ACL.ALLOW,
-            property: 'removeById'
-        },
-        {
-            principalType: ACL.ROLE,
-            principalId: Role.EVERYONE,
-            permission: ACL.ALLOW,
-            property: "login"
-        },
-        {
-            principalType: ACL.ROLE,
-            principalId: Role.EVERYONE,
-            permission: ACL.ALLOW,
-            property: "logout"
-        },
-        {
-            principalType: ACL.ROLE,
-            principalId: Role.OWNER,
-            permission: ACL.ALLOW,
-            property: "findById"
-        },
-        {
-            principalType: ACL.ROLE,
-            principalId: Role.OWNER,
-            permission: ACL.ALLOW,
-            property: "updateAttributes"
-        },
-        {
-            principalType: ACL.ROLE,
-            principalId: Role.EVERYONE,
-            permission: ACL.ALLOW,
-            property: "confirm"
-        }
-    ];
-
 
     // max ttl
     User.settings.maxTTL = User.settings.maxTTL || DEFAULT_MAX_TTL;
@@ -238,7 +186,7 @@ module.exports = function (User, app) {
         }
     };
 
-    sira.expose(User.login, {
+    User.expose('login', {
         accepts: [
             {arg: 'credentials', type: 'object', required: true, source: 'payload'}
         ],
@@ -249,7 +197,7 @@ module.exports = function (User, app) {
         http: {verb: 'post'}
     });
 
-    sira.expose(User.logout, {
+    User.expose('logout', {
         accepts: [
             {arg: 'access_token', type: 'string', required: true, source: function(ctx) {
                 var req = ctx && ctx.request;
@@ -263,7 +211,7 @@ module.exports = function (User, app) {
         http: {verb: 'all'}
     });
 
-//    sira.expose(User.confirm, {
+//    User.expose('confirm', {
 //        accepts: [
 //            {arg: 'uid', type: 'string', required: true},
 //            {arg: 'token', type: 'string', required: true}
@@ -271,7 +219,7 @@ module.exports = function (User, app) {
 //        http: {verb: 'get', path: '/confirm'}
 //    });
 
-    sira.expose(User.resetPassword, {
+    User.expose('resetPassword', {
         accepts: [
             {arg: 'options', type: 'object', required: true, source: 'payload'}
         ],

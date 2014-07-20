@@ -34,6 +34,7 @@ module.exports = {
             foreignKey: 'userId'
         }
     },
+    hidden: ['password'],
     acls: [
         {
             principalType: SEC.ROLE,
@@ -50,7 +51,7 @@ module.exports = {
             principalType: SEC.ROLE,
             principalId: SEC.OWNER,
             permission: SEC.ALLOW,
-            property: 'removeById'
+            property: 'deleteById'
         },
         {
             principalType: SEC.ROLE,
@@ -69,6 +70,12 @@ module.exports = {
             principalId: SEC.OWNER,
             permission: SEC.ALLOW,
             property: "findById"
+        },
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.OWNER,
+            permission: SEC.ALLOW,
+            property: "updateById"
         },
         {
             principalType: SEC.ROLE,

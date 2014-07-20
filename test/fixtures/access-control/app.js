@@ -16,6 +16,9 @@ module.exports = function (options, cb) {
     sapp.phase(sira.boot.database());
     sapp.phase(function () {
         sapp.use(sapp.dispatcher);
+        sapp.use(function (ctx) {
+            if (!ctx.handled) throw new Error('Unhandled request ' + ctx.request.uri);
+        });
     });
     sapp.phase(authorizer);
 
