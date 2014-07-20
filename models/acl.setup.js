@@ -2,7 +2,7 @@
 
 var async = require('async');
 var assert = require('assert');
-var debug = require('debug')('loopback:security:acl');
+var debug = require('debug')('sira:security:acl');
 
 var SEC = require('../lib/security');
 var ctx = require('../lib/access-context');
@@ -271,7 +271,7 @@ module.exports = function (ACL, app) {
     };
 
     ACL.prototype.debug = function() {
-        if(debug.enabled) {
+        if (debug.enabled) {
             debug('---ACL---');
             debug('model %s', this.model);
             debug('property %s', this.property);
@@ -280,7 +280,7 @@ module.exports = function (ACL, app) {
             debug('accessType %s', this.accessType);
             debug('permission %s', this.permission);
         }
-    }
+    };
 
     /**
      * Check if the request has the permission to access.

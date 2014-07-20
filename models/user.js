@@ -20,8 +20,12 @@ module.exports = {
         status: String,
 
         // Timestamps
-        created: {type: Date, default: function () { return new Date;}},
-        updated: {type: Date, default: function () { return new Date;}}
+        created: {type: Date, default: function () {
+            return new Date;
+        }},
+        updated: {type: Date, default: function () {
+            return new Date;
+        }}
     },
     relations: {
         accessTokens: {
@@ -30,55 +34,53 @@ module.exports = {
             foreignKey: 'userId'
         }
     },
-    settings: {
-        acls: [
-            {
-                principalType: SEC.ROLE,
-                principalId: SEC.EVERYONE,
-                permission: SEC.DENY
-            },
-            {
-                principalType: SEC.ROLE,
-                principalId: SEC.EVERYONE,
-                permission: SEC.ALLOW,
-                property: 'create'
-            },
-            {
-                principalType: SEC.ROLE,
-                principalId: SEC.OWNER,
-                permission: SEC.ALLOW,
-                property: 'removeById'
-            },
-            {
-                principalType: SEC.ROLE,
-                principalId: SEC.EVERYONE,
-                permission: SEC.ALLOW,
-                property: "login"
-            },
-            {
-                principalType: SEC.ROLE,
-                principalId: SEC.EVERYONE,
-                permission: SEC.ALLOW,
-                property: "logout"
-            },
-            {
-                principalType: SEC.ROLE,
-                principalId: SEC.OWNER,
-                permission: SEC.ALLOW,
-                property: "findById"
-            },
-            {
-                principalType: SEC.ROLE,
-                principalId: SEC.OWNER,
-                permission: SEC.ALLOW,
-                property: "updateAttributes"
-            },
-            {
-                principalType: SEC.ROLE,
-                principalId: SEC.EVERYONE,
-                permission: SEC.ALLOW,
-                property: "confirm"
-            }
-        ]
-    }
+    acls: [
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.EVERYONE,
+            permission: SEC.DENY
+        },
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.EVERYONE,
+            permission: SEC.ALLOW,
+            property: 'create'
+        },
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.OWNER,
+            permission: SEC.ALLOW,
+            property: 'removeById'
+        },
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.EVERYONE,
+            permission: SEC.ALLOW,
+            property: "login"
+        },
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.EVERYONE,
+            permission: SEC.ALLOW,
+            property: "logout"
+        },
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.OWNER,
+            permission: SEC.ALLOW,
+            property: "findById"
+        },
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.OWNER,
+            permission: SEC.ALLOW,
+            property: "updateAttributes"
+        },
+        {
+            principalType: SEC.ROLE,
+            principalId: SEC.EVERYONE,
+            permission: SEC.ALLOW,
+            property: "confirm"
+        }
+    ]
 };
