@@ -122,19 +122,19 @@ describe('AccessToken', function () {
 describe('authorize/direct', function () {
     this.timeout(0);
 
-    it('prevents remote call with 401 status on denied ACL', function (done) {
+    it('prevents call with 401 status on denied ACL', function (done) {
         setupWithTestToken().call(this, function (err) {
             if (err) return done(err);
             sira.rekuest('test.deleteById', {id: 123})
                 .prop('accessToken', this.token)
-                .send(this.sapp, function (err) {
+                .send(this.sapp, function (err, result) {
                     t.equal(err.statusCode, 401);
                     done();
                 });
         });
     });
 
-    it('prevent remote call with app setting status on denied ACL', function (done) {
+    it('prevent call with app setting status on denied ACL', function (done) {
         setupWithTestToken({app: {aclErrorStatus: 403}}).call(this, function (err) {
             if (err) return done(err);
             sira.rekuest('test.deleteById', {id: 123})
@@ -146,7 +146,7 @@ describe('authorize/direct', function () {
         });
     });
 
-    it('prevent remote call with model setting status on denied ACL', function (done) {
+    it('prevent call with model setting status on denied ACL', function (done) {
         setupWithTestToken({model: {aclErrorStatus: 404}}).call(this, function (err) {
             if (err) return done(err);
             sira.rekuest('test.deleteById', {id: 123})
@@ -158,7 +158,7 @@ describe('authorize/direct', function () {
         });
     });
 
-    it('prevent remote call if the accessToken is missing and required', function (done) {
+    it('prevent call if the accessToken is missing and required', function (done) {
         setupWithTestToken().call(this, function (err) {
             if (err) return done(err);
             sira.rekuest('test.deleteById', {id: 123})
@@ -259,6 +259,7 @@ function setupWithTestToken(settings) {
         var self = this;
 
         createSapp(settings, function (err, sapp) {
+            if (err) return done(err);
             self.sapp = sapp;
             createTestToken(sapp, function (err, token) {
                 if (err) return done.call(self, err);
@@ -287,18 +288,13 @@ function createSapp(settings, done) {
             principalId: "$everyone",
             accessType: SEC.ALL,
             permission: SEC.DENY,
-            property: 'removeById'
+            property: 'deleteById'
         }
     ]};
     _.assign(modelOptions, settings.model);
-
     var appOptions = {
         beforeBoot: function (sapp) {
-            sapp.registry.define('test', {
-                settings: modelOptions
-            }, function (test) {
-                sira.expose.model(test);
-            });
+            sapp.registry.define('test', modelOptions);
         }
     };
     _.assign(appOptions, settings.app);

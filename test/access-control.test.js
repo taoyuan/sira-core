@@ -2,15 +2,12 @@
 
 var st = require('sira-test');
 var s = require('./support');
-var t = s.t;
 var setupAccessControl = require('./fixtures/access-control/app');
 
 var USER = {email: 'test@test.test', password: 'test'};
 var CURRENT_USER = {email: 'current@test.test', password: 'test'};
-var debug = require('debug')('sira:test:access-control');
 
-
-describe.only('access control - integration', function () {
+describe('access control - integration', function () {
 
     st.beforeEach.withSapp(setupAccessControl());
 
@@ -74,7 +71,7 @@ describe.only('access control - integration', function () {
     });
 
 
-    describe.only('banks', function () {
+    describe('banks', function () {
         st.beforeEach.givenModel('bank');
 
         st.it.shouldBeAllowedWhenCalledAnonymously('banks.all');
