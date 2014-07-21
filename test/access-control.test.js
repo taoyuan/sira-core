@@ -1,6 +1,6 @@
 "use strict";
 
-var st = require('sira-test');
+var st = require('sira-test').local;
 var s = require('./support');
 var setupAccessControl = require('./fixtures/access-control/app');
 
