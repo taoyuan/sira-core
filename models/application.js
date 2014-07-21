@@ -1,46 +1,117 @@
 "use strict";
 
-module.exports = function (t) {
-    return {
-        properties: {
-            id: {type: String, id: true},
-            // Basic information
-            name: {type: String, required: true}, // The name
-            description: String, // The description
-            icon: String, // The icon image url
+var assert = require('assert');
 
-            owner: String, // The user id of the developer who registers the application
-            collaborators: [String], // A list of users ids who have permissions to work on this app
+module.exports = function (Application) {
 
-            // EMail
-            email: String, // e-mail address
-            emailVerified: Boolean, // Is the e-mail verified
+    Application.hook('beforeCreate', function (data) {
+        data.created = data.modified = new Date();
+        data.id = generateKey('id', 'md5');
+        data.clientKey = generateKey('client');
+        data.javaScriptKey = generateKey('javaScript');
+        data.restApiKey = generateKey('restApi');
+        data.windowsKey = generateKey('windows');
+        data.masterKey = generateKey('master');
+    });
 
-            // oAuth 2.0 settings
-            url: String, // The application url
-            callbackUrls: [String], // oAuth 2.0 code/token callback url
-            permissions: [String], // A list of permissions required by the application
 
-            // Keys
-            clientKey: String,
-            javaScriptKey: String,
-            restApiKey: String,
-            windowsKey: String,
-            masterKey: String,
+    /**
+     * Register a new application
+     * @param {String} owner Owner's user ID.
+     * @param {String} name  Name of the application
+     * @param {Object|Function} options  Other options
+     * @param {Function} cb  Callback function (err, application)
+     */
+    Application.register = function (owner, name, options, cb) {
+        assert(owner, 'owner is required');
+        assert(name, 'name is required');
 
-            // Push notification
-            pushSettings: t.JSON,
-
-            // User Authentication
-            authenticationEnabled: {type: Boolean, default: true},
-            anonymousAllowed: {type: Boolean, default: true},
-            authenticationSchemes: [t.JSON],
-
-            status: {type: String, default: 'sandbox'}, // Status of the application, production/sandbox/disabled
-
-            // Timestamps
-            created: {type: Date, default: function () { return new Date;}},
-            updated: {type: Date, default: function () { return new Date;}}
+        if (typeof options === 'function' && !cb) {
+            cb = options;
+            options = {};
         }
-    }
+        var props = {owner: owner, name: name};
+        for (var p in options) {
+            if (!(p in props)) {
+                props[p] = options[p];
+            }
+        }
+        this.create(props, cb);
+    };
+
+    /**
+     * Reset keys for the application instance
+     * @callback {Function} cb (err, application)
+     */
+    Application.prototype.resetKeys = function (cb) {
+        this.clientKey = generateKey('client');
+        this.javaScriptKey = generateKey('javaScript');
+        this.restApiKey = generateKey('restApi');
+        this.windowsKey = generateKey('windows');
+        this.masterKey = generateKey('master');
+        this.modified = new Date();
+        this.save(cb);
+    };
+
+    /**
+     * Reset keys for a given application by the appId
+     * @param {*} appId
+     * @param {Function} cb (err, application)
+     */
+    Application.resetKeys = function (appId, cb) {
+        this.findById(appId, function (err, app) {
+            if (err) {
+                cb && cb(err, app);
+                return;
+            }
+            app.resetKeys(cb);
+        });
+    };
+
+    /**
+     * Authenticate the application id and key.
+     *
+     * `matched` parameter is one of:
+     * - clientKey
+     * - javaScriptKey
+     * - restApiKey
+     * - windowsKey
+     * - masterKey
+     *
+     * @param {*} appId
+     * @param {String} key
+     * @param {Function} cb (err, matched)
+     */
+    Application.authenticate = function (appId, key, cb) {
+        this.findById(appId, function (err, app) {
+            if (err || !app) {
+                cb && cb(err, null);
+                return;
+            }
+            var result = null;
+            var keyNames = ['clientKey', 'javaScriptKey', 'restApiKey', 'windowsKey', 'masterKey'];
+            for (var i = 0; i < keyNames.length; i++) {
+                if (app[keyNames[i]] === key) {
+                    result = {
+                        application: app,
+                        keyType: keyNames[i]
+                    };
+                    break;
+                }
+            }
+            cb && cb(null, result);
+        });
+    };
 };
+
+var crypto = require('crypto');
+
+function generateKey(hmacKey, algorithm, encoding) {
+    hmacKey = hmacKey || 'loopback';
+    algorithm = algorithm || 'sha1';
+    encoding = encoding || 'hex';
+    var hmac = crypto.createHmac(algorithm, hmacKey);
+    var buf = crypto.randomBytes(32);
+    hmac.update(buf);
+    return hmac.digest(encoding);
+}
