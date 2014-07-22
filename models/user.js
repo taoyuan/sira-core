@@ -1,5 +1,6 @@
 "use strict";
 
+var debug = require('debug')('sira-core:user');
 var validator = require('validator');
 var bcrypt = require('bcryptjs');
 
@@ -188,7 +189,7 @@ module.exports = function (User, app) {
 
     User.expose('login', {
         accepts: [
-            {arg: 'credentials', type: 'object', required: true, source: 'payload'}
+            {arg: 'credentials', type: 'object', required: true, source: 'body'}
         ],
         returns: {
             arg: 'accessToken', type: 'object', root: true, description:
@@ -221,7 +222,7 @@ module.exports = function (User, app) {
 
     User.expose('resetPassword', {
         accepts: [
-            {arg: 'options', type: 'object', required: true, source: 'payload', http: { source: 'body' }}
+            {arg: 'options', type: 'object', required: true, source: 'body'}
         ],
         http: {verb: 'post', path: '/reset'}
     });
