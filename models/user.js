@@ -221,7 +221,7 @@ module.exports = function (User, app) {
 
     User.expose('resetPassword', {
         accepts: [
-            {arg: 'options', type: 'object', required: true, source: 'payload'}
+            {arg: 'options', type: 'object', required: true, source: 'payload', http: { source: 'body' }}
         ],
         http: {verb: 'post', path: '/reset'}
     });
