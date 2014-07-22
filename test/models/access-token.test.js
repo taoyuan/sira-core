@@ -282,15 +282,17 @@ function createSapp(settings, done) {
     }
     settings = settings || {};
 
-    var modelOptions = {acls: [
-        {
-            principalType: "ROLE",
-            principalId: "$everyone",
-            accessType: SEC.ALL,
-            permission: SEC.DENY,
-            property: 'deleteById'
-        }
-    ]};
+    var modelOptions = {
+        crud: true,
+        acls: [
+            {
+                principalType: "ROLE",
+                principalId: "$everyone",
+                accessType: SEC.ALL,
+                permission: SEC.DENY,
+                property: 'deleteById'
+            }
+        ]};
     _.assign(modelOptions, settings.model);
     var appOptions = {
         beforeBoot: function (sapp) {

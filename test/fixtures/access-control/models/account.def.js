@@ -1,6 +1,7 @@
 "use strict";
 
 module.exports = {
+    "crud": true,
     "relations": {
         "transactions": {
             "model": "transaction",

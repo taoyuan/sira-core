@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = {
-
+    "crud": true,
     "relations": {
         "users": {
             "model": "user",
