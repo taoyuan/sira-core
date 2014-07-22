@@ -21,6 +21,10 @@ describe('Role', function () {
             })
         });
 
+        afterEach(function (done) {
+            s.destroyAll([User, Role, RoleMapping], done);
+        });
+
         it("should define role/role relations", function (done) {
             Role.create({name: 'user'}, function (err, userRole) {
                 Role.create({name: 'admin'}, function (err, adminRole) {
@@ -203,6 +207,9 @@ describe('Role', function () {
             });
         });
 
+        afterEach(function (done) {
+            s.destroyAll([User, Role, ACL, Album], done);
+        });
 
         it("should support owner role resolver", function (done) {
             var check = t.plan(8, done);
@@ -249,7 +256,6 @@ describe('Role', function () {
                     });
                 });
             });
-
         });
     });
 

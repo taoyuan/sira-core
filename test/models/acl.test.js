@@ -7,7 +7,7 @@ var t = s.t;
 var SEC = require('../../').security;
 
 function checkResult(done) {
-    return function(err, result) {
+    return function (err, result) {
         t(!err);
         done && done();
     }
@@ -17,7 +17,8 @@ describe('Security Scopes', function () {
     var app;
     var ACL, Role, RoleMapping, User, Scope;
     var testModel;
-    beforeEach(function(done) {
+
+    beforeEach(function (done) {
         app = s.bootApp(function () {
             ACL = app.model('ACL');
             Role = app.model('Role');
@@ -28,6 +29,10 @@ describe('Security Scopes', function () {
             done();
         });
         app.registry.define('testModel');
+    });
+
+    afterEach(function (done) {
+        s.destroyAll([ACL, Role, RoleMapping, User, Scope, testModel], done);
     });
 
     it("should allow access to models for the given scope by wildcard", function (done) {
@@ -79,7 +84,7 @@ describe('Security Scopes', function () {
 describe('Security ACLs', function () {
     var app;
     var ACL, Role, RoleMapping, User, Scope, Customer;
-    beforeEach(function(done) {
+    beforeEach(function (done) {
         app = s.bootApp(function () {
             ACL = app.model('ACL');
             Role = app.model('Role');
@@ -108,7 +113,12 @@ describe('Security ACLs', function () {
         });
     });
 
-    it('should order ACL entries based on the matching score', function() {
+    afterEach(function (done) {
+        s.destroyAll([ACL, Role, RoleMapping, User, Scope, Customer], done);
+    });
+
+
+    it('should order ACL entries based on the matching score', function () {
         var acls = [
             {
                 "model": "account",
@@ -138,7 +148,9 @@ describe('Security ACLs', function () {
             accessType: 'WRITE'
         };
 
-        acls = acls.map(function(a) { return new ACL(a)});
+        acls = acls.map(function (a) {
+            return new ACL(a)
+        });
 
         var perm = ACL.resolvePermission(acls, req);
         t.deepEqual(_.clone(perm), { // remove perm prototype data

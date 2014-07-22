@@ -3,7 +3,7 @@
 module.exports = function () {
     return {
         properties: {
-            name: {type: String, required: true},
+            name: {type: String, index: true, required: true},
             description: String
         }
     }

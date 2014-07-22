@@ -1,6 +1,7 @@
 "use strict";
 
 var sira = require('sira');
+var async = require('async');
 var chai = exports.chai = require('chai');
 chai.config.includeStack = true;
 
@@ -21,7 +22,7 @@ exports.bootApp = function (options, done) {
     }
     options = options || {};
     options.db = options.db || {
-        driver: 'memory'//'redis-hq'
+        driver: 'redis-hq'
     };
 
     var sapp = new sira.Application;
@@ -59,4 +60,18 @@ exports.bootAppSync = function (options, done) {
     options = options || {};
     options.sync = true;
     return exports.bootApp(options, done);
+};
+
+exports.destroyAll = function (models, done) {
+
+    if (!(Array.isArray(models))) {
+        models = [models];
+    }
+    done = done || function () {};
+
+    async.series(models.map(function (Model) {
+        return function (callback) {
+            Model.destroyAll(callback);
+        }
+    }), done);
 };

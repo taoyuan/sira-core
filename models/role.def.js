@@ -3,8 +3,8 @@
 module.exports = function () {
     return {
         properties: {
-            id: {type: String, id: true, generated: true}, // Id
-            name: {type: String, required: true}, // The name of a role
+            id: {type: Number}, // Id
+            name: {type: String, index: true, required: true}, // The name of a role
             description: String, // Description
 
             // Timestamps

@@ -3,9 +3,9 @@
 module.exports = function (t) {
     return {
         properties: {
-            id: {type: String, id: true},
+            id: {type: String},
             // Basic information
-            name: {type: String, required: true}, // The name
+            name: {type: String, index: true, required: true}, // The name
             description: String, // The description
             icon: String, // The icon image url
 

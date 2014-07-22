@@ -6,7 +6,7 @@ var bcrypt = require('bcryptjs');
 
 var SALT_WORK_FACTOR = 10;
 var DEFAULT_TTL = 1209600; // 2 weeks in seconds
-var DEFAULT_RESET_PW_TTL = 15 * 60 ;// 15 mins in seconds
+var DEFAULT_RESET_PW_TTL = 15 * 60;// 15 mins in seconds
 var DEFAULT_MAX_TTL = 31556926; // 1 year in second
 
 module.exports = function (User, app) {
@@ -37,7 +37,7 @@ module.exports = function (User, app) {
      * @param {Number} [ttl] The requested ttl
      * @param {Function} cb The callback function (err, token)
      */
-    User.prototype.createAccessToken = function(ttl, cb) {
+    User.prototype.createAccessToken = function (ttl, cb) {
         var Clazz = this.constructor;
         ttl = Math.min(ttl || Clazz.settings.ttl, Clazz.settings.maxTTL);
         this.accessTokens.create({
@@ -63,9 +63,9 @@ module.exports = function (User, app) {
         var self = this;
 
         var query = {};
-        if(credentials.email) {
+        if (credentials.email) {
             query.email = credentials.email;
-        } else if(credentials.username) {
+        } else if (credentials.username) {
             query.username = credentials.username;
         } else {
             var err = new Error('username or email is required');
@@ -73,20 +73,20 @@ module.exports = function (User, app) {
             return cb(err);
         }
 
-        self.findOne({where: query}, function(err, user) {
+        self.findOne({where: query}, function (err, user) {
             var defaultError = new Error('login failed');
             defaultError.statusCode = 401;
 
-            if(err) {
+            if (err) {
                 debug('An error is reported from User.findOne: %j', err);
                 cb(defaultError);
-            } else if(user) {
-                user.validatePassword(credentials.password, function(err, isMatch) {
-                    if(err) {
+            } else if (user) {
+                user.validatePassword(credentials.password, function (err, isMatch) {
+                    if (err) {
                         debug('An error is reported from User.validatePassword: %j', err);
                         cb(defaultError);
-                    } else if(isMatch) {
-                        user.createAccessToken(credentials.ttl, function(err, token) {
+                    } else if (isMatch) {
+                        user.createAccessToken(credentials.ttl, function (err, token) {
                             if (err) return cb(err);
                             token.__data.user = user;
                             cb(err, token);
@@ -119,8 +119,8 @@ module.exports = function (User, app) {
     User.logout = function (tokenId, cb) {
         this.relations.accessTokens.modelTo.findById(tokenId, function (err, accessToken) {
             if (err) return cb(err);
-            if(accessToken) return accessToken.destroy(cb);
-            cb(new Error('could not find accessToken'));
+            if (accessToken) return accessToken.destroy(cb);
+            cb(new Error('Could not find accessToken'));
         });
     };
 
@@ -133,7 +133,7 @@ module.exports = function (User, app) {
 
     User.prototype.validatePassword = function (password, cb) {
         if (this.password && password) {
-            bcrypt.compare(password, this.password, function(err, isMatch) {
+            bcrypt.compare(password, this.password, function (err, isMatch) {
                 if (err) return cb(err);
                 cb(null, isMatch);
             });
@@ -152,23 +152,23 @@ module.exports = function (User, app) {
      * @param {Function} cb (err, ingo)
      */
 
-    User.resetPassword = function(options, cb) {
+    User.resetPassword = function (options, cb) {
         var Clazz = this;
         var ttl = Clazz.settings.resetPasswordTokenTTL || DEFAULT_RESET_PW_TTL;
 
         options = options || {};
-        if(typeof options.email === 'string') {
-            Clazz.findOne({ where: {email: options.email} }, function(err, user) {
-                if(err) {
+        if (typeof options.email === 'string') {
+            Clazz.findOne({ where: {email: options.email} }, function (err, user) {
+                if (err) {
                     cb(err);
                 } else if (user) {
                     // create a short lived access token for temp login to change password
                     // TODO - eventually this should only allow password change
-                    user.accessTokens.create({ttl: ttl}, function(err, accessToken) {
-                        if(err) {
+                    user.accessTokens.create({ttl: ttl}, function (err, accessToken) {
+                        if (err) {
                             cb(err);
                         } else {
-                            cb(null,  {
+                            cb(null, {
                                 email: options.email,
                                 accessToken: accessToken,
                                 user: user
@@ -192,20 +192,18 @@ module.exports = function (User, app) {
             {arg: 'credentials', type: 'object', required: true, source: 'body'}
         ],
         returns: {
-            arg: 'accessToken', type: 'object', root: true, description:
-                'The result AccessToken created on login.\n\n'
+            arg: 'accessToken', type: 'object', root: true, description: 'The result AccessToken created on login.\n\n'
         },
         http: {verb: 'post'}
     });
 
     User.expose('logout', {
         accepts: [
-            {arg: 'access_token', type: 'string', required: true, source: function(ctx) {
+            {arg: 'access_token', type: 'string', required: true, source: function (ctx) {
                 var req = ctx && ctx.request;
                 var accessToken = req && (req.accessToken || req.token);
                 return accessToken && accessToken.id;
-            }, description:
-                'Do not supply this argument, it is automatically extracted ' +
+            }, description: 'Do not supply this argument, it is automatically extracted ' +
                 'from request.'
             }
         ],

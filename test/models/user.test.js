@@ -176,7 +176,7 @@ describe('User', function () {
 
             function logout(err, token) {
                 sira.rekuest('user.logout')
-                    .prop('token', token)
+                    .prop('accessToken', token)
                     .send(app, verify(token.id, done));
             }
         });

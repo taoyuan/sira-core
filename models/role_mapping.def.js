@@ -3,9 +3,9 @@
 module.exports = function () {
     return {
         properties: {
-            id: {type: String, id: true, generated: true}, // Id
-            principalType: String, // The principal type, such as user, application, or role
-            principalId: String // The principal id
+            id: {type: String}, // Id
+            principalType: {type: String, index: true}, // The principal type, such as user, application, or role
+            principalId: {type: String, index: true} // The principal id
         },
         relations: {
             role: {

@@ -11,50 +11,50 @@ describe('access control - integration', function () {
 
     st.beforeEach.withSapp(setupAccessControl());
 
-    describe('users', function () {
+    describe('user', function () {
 
         st.beforeEach.givenModel('user', USER, 'randomUser');
 
-        st.it.shouldBeDeniedWhenCalledAnonymously('users.all');
-        st.it.shouldBeDeniedWhenCalledUnauthenticated('users.all');
-        st.it.shouldBeDeniedWhenCalledByUser(CURRENT_USER, 'users.all');
+        st.it.shouldBeDeniedWhenCalledAnonymously('user.all');
+        st.it.shouldBeDeniedWhenCalledUnauthenticated('user.all');
+        st.it.shouldBeDeniedWhenCalledByUser(CURRENT_USER, 'user.all');
 
-        st.it.shouldBeDeniedWhenCalledAnonymously('users.findById', dataForUser);
-        st.it.shouldBeDeniedWhenCalledUnauthenticated('users.findById', dataForUser);
-        st.it.shouldBeDeniedWhenCalledByUser(CURRENT_USER, 'users.findById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledAnonymously('user.findById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledUnauthenticated('user.findById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledByUser(CURRENT_USER, 'user.findById', dataForUser);
 
-        st.it.shouldBeAllowedWhenCalledAnonymously('users.create', newUserData());
-        st.it.shouldBeAllowedWhenCalledByUser(CURRENT_USER, 'users.create', newUserData());
+        st.it.shouldBeAllowedWhenCalledAnonymously('user.create', newUserData());
+        st.it.shouldBeAllowedWhenCalledByUser(CURRENT_USER, 'user.create', newUserData());
 
-        st.it.shouldBeAllowedWhenCalledByUser(CURRENT_USER, 'users.logout');
+        st.it.shouldBeAllowedWhenCalledByUser(CURRENT_USER, 'user.logout');
 
-        st.describe.whenCalledLocally('users.deleteById', function() {
+        st.describe.whenCalledLocally('user.deleteById', function() {
             // `deleteById` is allowed for the owner, and the owner acl resolver requires `id` param,.
             // here no param provided, so the request should be denied.
-            // Under rest mode, url will be DELETE /users/:id, so the request url should not be found.
+            // Under rest mode, url will be DELETE /user/:id, so the request url should not be found.
             st.it.shouldBeDenied();
             // st.it.shouldNotBeFound();
         });
 
-        st.it.shouldBeDeniedWhenCalledAnonymously('users.updateById', dataForUser);
-        st.it.shouldBeDeniedWhenCalledUnauthenticated('users.updateById', dataForUser);
-        st.it.shouldBeDeniedWhenCalledByUser(CURRENT_USER, 'users.updateById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledAnonymously('user.updateById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledUnauthenticated('user.updateById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledByUser(CURRENT_USER, 'user.updateById', dataForUser);
 
         st.describe.whenLoggedInAsUser(CURRENT_USER, function() {
             beforeEach(function() {
                 this.data = { id: this.user.id }
             });
-            st.describe.whenCalledLocally('users.deleteById', function() {
+            st.describe.whenCalledLocally('user.deleteById', function() {
                 st.it.shouldBeAllowed();
             });
-            st.describe.whenCalledLocally('users.updateById', function() {
+            st.describe.whenCalledLocally('user.updateById', function() {
                 st.it.shouldBeAllowed();
             });
         });
 
-        st.it.shouldBeDeniedWhenCalledAnonymously('users.deleteById', dataForUser);
-        st.it.shouldBeDeniedWhenCalledUnauthenticated('users.deleteById', dataForUser);
-        st.it.shouldBeDeniedWhenCalledByUser(CURRENT_USER, 'users.deleteById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledAnonymously('user.deleteById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledUnauthenticated('user.deleteById', dataForUser);
+        st.it.shouldBeDeniedWhenCalledByUser(CURRENT_USER, 'user.deleteById', dataForUser);
 
         function dataForUser() {
             return {id: this.randomUser.id}

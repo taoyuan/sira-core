@@ -5,7 +5,7 @@ var DEFAULT_TTL = 1209600; // 2 weeks in seconds
 module.exports = {
     name: 'AccessToken',
     properties: {
-        id: { type: String },
+        id: { type: String, index: true },
         ttl: { type: Number, default: DEFAULT_TTL },
         created: {type: Date, default: function () { return new Date;}}
     },
