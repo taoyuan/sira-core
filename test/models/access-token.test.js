@@ -7,10 +7,11 @@ var request = require('supertest');
 var s = require('../support');
 var t = s.t;
 var SEC = require('../../').security;
-var tokenMiddleware = require('sira-connect-token');
+var connectToken = require('sira-connect-token');
+var connectRest = require('sira-connect-rest');
 
 describe('token(options)', function () {
-    beforeEach(setupWithTestToken());
+    beforeEach(setupWithTestToken);
 
     it('should populate req.token from the query string', function (done) {
         createTestAppAndRequest(this.sapp, this.token, done)
@@ -80,7 +81,7 @@ describe('token(options)', function () {
             req.accessToken = tokenStub;
             next();
         });
-        app.use(tokenMiddleware({ model: sapp.models.AccessToken }));
+        app.use(connectToken(sapp));
         app.get('/', function (req, res, next) {
             res.send(req.accessToken);
         });
@@ -98,7 +99,7 @@ describe('token(options)', function () {
 
 
 describe('AccessToken', function () {
-    beforeEach(setupWithTestToken());
+    beforeEach(setupWithTestToken);
 
     it('should auto-generate id', function () {
         assert(this.token.id);
@@ -123,7 +124,7 @@ describe('authorize/direct', function () {
     this.timeout(0);
 
     it('prevents call with 401 status on denied ACL', function (done) {
-        setupWithTestToken().call(this, function (err) {
+        setupWithTestToken.call(this, function (err) {
             if (err) return done(err);
             sira.rekuest('test.deleteById', {id: 123})
                 .prop('accessToken', this.token)
@@ -135,7 +136,7 @@ describe('authorize/direct', function () {
     });
 
     it('prevent call with app setting status on denied ACL', function (done) {
-        setupWithTestToken({app: {aclErrorStatus: 403}}).call(this, function (err) {
+        setupWithTestToken.call(this, {app: {aclErrorStatus: 403}}, function (err) {
             if (err) return done(err);
             sira.rekuest('test.deleteById', {id: 123})
                 .prop('accessToken', this.token)
@@ -147,7 +148,7 @@ describe('authorize/direct', function () {
     });
 
     it('prevent call with model setting status on denied ACL', function (done) {
-        setupWithTestToken({model: {aclErrorStatus: 404}}).call(this, function (err) {
+        setupWithTestToken.call(this, {model: {aclErrorStatus: 404}}, function (err) {
             if (err) return done(err);
             sira.rekuest('test.deleteById', {id: 123})
                 .prop('accessToken', this.token)
@@ -159,7 +160,7 @@ describe('authorize/direct', function () {
     });
 
     it('prevent call if the accessToken is missing and required', function (done) {
-        setupWithTestToken().call(this, function (err) {
+        setupWithTestToken.call(this, function (err) {
             if (err) return done(err);
             sira.rekuest('test.deleteById', {id: 123})
                 .send(this.sapp, function (err) {
@@ -171,41 +172,47 @@ describe('authorize/direct', function () {
 
 });
 
-describe.skip('authorize/rest', function () {
+describe('authorize/rest', function () {
     this.timeout(0);
 
-    beforeEach(setupWithTestToken());
-
     it('prevents remote call with 401 status on denied ACL', function (done) {
-        createTestAppAndRequest(this.sapp, this.token, done)
-            .del('/tests/123')
-            .expect(401)
-            .set('authorization', this.token.id)
-            .end(done);
+        setupWithTestToken.call(this, function () {
+            createTestAppAndRequest(this.sapp, this.token, done)
+                .del('/test/123')
+                .expect(401)
+                .set('authorization', this.token.id)
+                .end(done);
+        });
     });
 
     it('prevent remote call with app setting status on denied ACL', function (done) {
-        createTestAppAndRequest(this.sapp, this.token, {aclErrorStatus: 403}, done)
-            .del('/tests/123')
-            .expect(403)
-            .set('authorization', this.token.id)
-            .end(done);
+        setupWithTestToken.call(this, {app: {aclErrorStatus: 403}}, function () {
+            createTestAppAndRequest(this.sapp, this.token, done)
+                .del('/test/123')
+                .expect(403)
+                .set('authorization', this.token.id)
+                .end(done);
+        });
     });
 
-    it.skip('prevent remote call with app setting status on denied ACL', function (done) {
-        createTestAppAndRequest(this.sapp, this.token, {model: {aclErrorStatus: 404}}, done)
-            .del('/tests/123')
-            .expect(404)
-            .set('authorization', this.token.id)
-            .end(done);
+    it('prevent remote call with app setting status on denied ACL', function (done) {
+        setupWithTestToken.call(this, {model: {aclErrorStatus: 404}}, function () {
+            createTestAppAndRequest(this.sapp, this.token, done)
+                .del('/test/123')
+                .expect(404)
+                .set('authorization', this.token.id)
+                .end(done);
+        });
     });
 
     it('prevent remote call if the accessToken is missing and required', function (done) {
-        createTestAppAndRequest(this.sapp, null, done)
-            .del('/tests/123')
-            .expect(401)
-            .set('authorization', null)
-            .end(done);
+        setupWithTestToken.call(this, function () {
+            createTestAppAndRequest(this.sapp, null, done)
+                .del('/test/123')
+                .expect(401)
+                .set('authorization', null)
+                .end(done);
+        });
     });
 
 });
@@ -230,7 +237,8 @@ function createTestApp(sapp, token, settings, done) {
     var app = express();
 
     app.use(cookieParser('secret'));
-    app.use(tokenMiddleware({resolver: sapp.model('AccessToken')}));
+    app.use(connectToken(sapp));
+
     app.get('/token', function (req, res) {
         res.cookie('authorization', token.id, {signed: true});
         res.end();
@@ -244,6 +252,7 @@ function createTestApp(sapp, token, settings, done) {
         }
         res.send('ok');
     });
+    app.use(connectRest(sapp));
 
     Object.keys(settings).forEach(function (key) {
         app.set(key, settings[key]);
@@ -252,22 +261,24 @@ function createTestApp(sapp, token, settings, done) {
     return app;
 }
 
-function setupWithTestToken(settings) {
+function setupWithTestToken(settings, done) {
+    if (typeof settings === 'function') {
+        done = settings;
+        settings = null;
+    }
     settings = settings || {};
 
-    return function (done) {
-        var self = this;
+    var self = this;
 
-        createSapp(settings, function (err, sapp) {
-            if (err) return done(err);
-            self.sapp = sapp;
-            createTestToken(sapp, function (err, token) {
-                if (err) return done.call(self, err);
-                self.token = token;
-                done.call(self);
-            });
+    createSapp(settings, function (err, sapp) {
+        if (err) return done(err);
+        self.sapp = sapp;
+        createTestToken(sapp, function (err, token) {
+            if (err) return done.call(self, err);
+            self.token = token;
+            done.call(self);
         });
-    }
+    });
 }
 
 function createTestToken(sapp, cb) {
@@ -299,7 +310,7 @@ function createSapp(settings, done) {
             sapp.registry.define('test', modelOptions);
         }
     };
-    _.assign(appOptions, settings.app);
+    _.assign(appOptions, settings.app || settings.sapp);
 
     s.bootAppSync(appOptions, done);
 }

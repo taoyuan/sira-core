@@ -25,6 +25,7 @@
     "mocha": "^1.20.1",
     "sira": "taoyuan/sira",
     "sira-connect-token": "taoyuan/sira-connect-token",
+    "sira-connect-rest": "taoyuan/sira-connect-rest",
     "sira-test": "taoyuan/sira-test",
     "supertest": "^0.13.0"
   },
