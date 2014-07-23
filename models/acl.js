@@ -4,32 +4,32 @@ var async = require('async');
 var assert = require('assert');
 var debug = require('debug')('sira:security:acl');
 
-var SEC = require('../lib/security');
-var ctx = require('../lib/access-context');
-var AccessContext = ctx.AccessContext;
-var Principal = ctx.Principal;
-var AccessRequest = ctx.AccessRequest;
+var sec = require('../lib/security');
+var accessing = require('../lib/accessing');
+var AccessContext = accessing.AccessContext;
+var Principal = accessing.Principal;
+var AccessRequest = accessing.AccessRequest;
 
 module.exports = function (ACL, app) {
 
     var Role = app.model('Role');
 
-    ACL.ALL = SEC.ALL;
+    ACL.ALL = sec.ALL;
 
-    ACL.DEFAULT = SEC.DEFAULT; // Not specified
-    ACL.ALLOW = SEC.ALLOW; // Allow
-    ACL.ALARM = SEC.ALARM; // Warn - send an alarm
-    ACL.AUDIT = SEC.AUDIT; // Audit - record the access
-    ACL.DENY = SEC.DENY; // Deny
+    ACL.DEFAULT = sec.DEFAULT; // Not specified
+    ACL.ALLOW = sec.ALLOW; // Allow
+    ACL.ALARM = sec.ALARM; // Warn - send an alarm
+    ACL.AUDIT = sec.AUDIT; // Audit - record the access
+    ACL.DENY = sec.DENY; // Deny
 
-    ACL.READ = SEC.READ; // Read operation
-    ACL.WRITE = SEC.WRITE; // Write operation
-    ACL.EXECUTE = SEC.EXECUTE; // Execute operation
+    ACL.READ = sec.READ; // Read operation
+    ACL.WRITE = sec.WRITE; // Write operation
+    ACL.EXECUTE = sec.EXECUTE; // Execute operation
 
-    ACL.USER = SEC.USER;
-    ACL.APP = ACL.APPLICATION = SEC.APPLICATION;
-    ACL.ROLE = SEC.ROLE;
-    ACL.SCOPE = SEC.SCOPE;
+    ACL.USER = sec.USER;
+    ACL.APP = ACL.APPLICATION = sec.APPLICATION;
+    ACL.ROLE = sec.ROLE;
+    ACL.SCOPE = sec.SCOPE;
 
 
     /**
@@ -70,7 +70,7 @@ module.exports = function (ACL, app) {
         // - other
         // user > app > role > ...
         score = score * 4;
-        switch(rule.principalType) {
+        switch (rule.principalType) {
             case ACL.USER:
                 score += 4;
                 break;
@@ -81,14 +81,14 @@ module.exports = function (ACL, app) {
                 score += 2;
                 break;
             default:
-                score +=1;
+                score += 1;
         }
 
         // Weigh against the roles
         // everyone < authenticated/unauthenticated < related < owner < ...
         score = score * 8;
-        if(rule.principalType === ACL.ROLE) {
-            switch(rule.principalId) {
+        if (rule.principalType === ACL.ROLE) {
+            switch (rule.principalId) {
                 case Role.OWNER:
                     score += 4;
                     break;
@@ -117,18 +117,19 @@ module.exports = function (ACL, app) {
      * @returns {Number} score
      */
 
-    ACL.prototype.score = function(req) {
+    ACL.prototype.score = function (req) {
         return this.constructor.calcMatchingScore(this, req);
     };
 
-    /*!
+    /**
      * Resolve permission from the ACLs
-     * @param {Object[]) acls The list of ACLs
+     *
+     * @param {Object[]} acls The list of ACLs
      * @param {Object} req The request
      * @returns {AccessRequest} result The effective ACL
      */
     ACL.resolvePermission = function resolvePermission(acls, req) {
-        if(!(req instanceof AccessRequest)) {
+        if (!(req instanceof AccessRequest)) {
             req = new AccessRequest(req);
         }
         // Sort by the matching score in descending order
@@ -149,21 +150,20 @@ module.exports = function (ACL, app) {
                 permission = acls[i].permission;
                 break;
             } else {
-                if(req.exactlyMatches(acls[i])) {
+                if (req.exactlyMatches(acls[i])) {
                     permission = acls[i].permission;
                     break;
                 }
                 // For wildcard match, find the strongest permission
-                if(AccessContext.permissionOrder[acls[i].permission]
-                    > AccessContext.permissionOrder[permission]) {
+                if (AccessContext.permissionOrder[acls[i].permission] > AccessContext.permissionOrder[permission]) {
                     permission = acls[i].permission;
                 }
             }
         }
 
-        if(debug.enabled) {
+        if (debug.enabled) {
             debug('The following ACLs were searched: ');
-            acls.forEach(function(acl) {
+            acls.forEach(function (acl) {
                 acl.debug();
                 debug('with score:', acl.score(req));
             });
@@ -172,14 +172,14 @@ module.exports = function (ACL, app) {
         return new AccessRequest(req.model, req.property, req.accessType, permission || ACL.DEFAULT);
     };
 
-    /*!
-     * Get the static ACLs from the model definition
+    /**
+     * Build the static ACLs from the model definition
      * @param {String} model The model name
      * @param {String} property The property/method/relation name
      *
      * @return {Object[]} An array of ACLs
      */
-    ACL.getStaticACLs = function getStaticACLs(model, property) {
+    ACL.buildStaticACLs = function buildStaticACLs(model, property) {
         var modelClass = app.model(model);
         var staticACLs = [];
         if (modelClass && modelClass.settings.acls) {
@@ -196,7 +196,6 @@ module.exports = function (ACL, app) {
         }
         var prop = modelClass &&
             (modelClass.properties[property] // regular property
-                || (modelClass._scopeMeta && modelClass._scopeMeta[property]) // relation/scope
                 || modelClass[property] // static method
                 || modelClass.prototype[property]); // prototype method
         if (prop && prop.acls) {
@@ -223,10 +222,8 @@ module.exports = function (ACL, app) {
      * @param {String} accessType The access type.
      * @param {Function} callback Callback function. (err, accessRequest)
      */
-    ACL.checkPermission = function checkPermission(principalType, principalId,
-                                                   model, property, accessType,
-                                                   callback) {
-        if(principalId !== null && principalId !== undefined && (typeof principalId !== 'string') ) {
+    ACL.checkPermission = function checkPermission(principalType, principalId, model, property, accessType, callback) {
+        if (principalId !== null && principalId !== undefined && (typeof principalId !== 'string')) {
             principalId = principalId.toString();
         }
         property = property || ACL.ALL;
@@ -236,14 +233,14 @@ module.exports = function (ACL, app) {
 
         var req = new AccessRequest(model, property, accessType);
 
-        var acls = this.getStaticACLs(model, property);
+        var acls = this.buildStaticACLs(model, property);
 
         var resolved = this.resolvePermission(acls, req);
 
-        if(resolved && resolved.permission === ACL.DENY) {
+        if (resolved && resolved.permission === ACL.DENY) {
             debug('Permission denied by statically resolved permission');
-            debug(' Resolved Permission: %j', resolved);
-            process.nextTick(function() {
+            debug('  Resolved Permission: %j', resolved);
+            process.nextTick(function () {
                 callback && callback(null, resolved);
             });
             return;
@@ -256,21 +253,19 @@ module.exports = function (ACL, app) {
         if (accessTypeQuery) where.accessType = accessTypeQuery;
 
         this.all({where: where}, function (err, dynACLs) {
-                if (err) {
-                    callback && callback(err);
-                    return;
-                }
-                acls = acls.concat(dynACLs);
-                resolved = self.resolvePermission(acls, req);
-                if(resolved && resolved.permission === ACL.DEFAULT) {
-                    var modelClass = app.model(model);
-                    resolved.permission = (modelClass && modelClass.settings.defaultPermission) || ACL.ALLOW;
-                }
-                callback && callback(null, resolved);
-            });
+            if (err) return callback && callback(err);
+
+            acls = acls.concat(dynACLs);
+            resolved = self.resolvePermission(acls, req);
+            if (resolved && resolved.permission === ACL.DEFAULT) {
+                var modelClass = app.model(model);
+                resolved.permission = (modelClass && modelClass.settings.defaultPermission) || ACL.ALLOW;
+            }
+            callback && callback(null, resolved);
+        });
     };
 
-    ACL.prototype.debug = function() {
+    ACL.prototype.debug = function () {
         if (debug.enabled) {
             debug('---ACL---');
             debug('model %s', this.model);
@@ -284,6 +279,7 @@ module.exports = function (ACL, app) {
 
     /**
      * Check if the request has the permission to access.
+     *
      * @param {Object|AccessContext} context See below.
      *  @param {Object[]} context.principals An array of principals.
      *  @param {String|Model} context.model The model name or model class.
@@ -292,9 +288,8 @@ module.exports = function (ACL, app) {
      *  @param {String} context.accessType The access type: READE, WRITE, or EXEC.
      * @param {Function} callback Callback function
      */
-
     ACL.checkAccessForContext = function (context, callback) {
-        if(!(context instanceof AccessContext)) {
+        if (!(context instanceof AccessContext)) {
             context = new AccessContext(context, app);
         }
 
@@ -310,15 +305,14 @@ module.exports = function (ACL, app) {
         var req = new AccessRequest(modelName, property, accessType, ACL.DEFAULT, methodNames);
 
         var effectiveACLs = [];
-        var staticACLs = this.getStaticACLs(model.modelName, property);
+        var staticACLs = this.buildStaticACLs(model.modelName, property);
 
         var self = this;
         this.all({where: {model: model.modelName, property: propertyQuery,
             accessType: accessTypeQuery}}, function (err, acls) {
-            if (err) {
-                callback && callback(err);
-                return;
-            }
+
+            if (err) return callback && callback(err);
+
             var inRoleTasks = [];
 
             acls = acls.concat(staticACLs);
@@ -337,24 +331,23 @@ module.exports = function (ACL, app) {
                 // Check role matches
                 if (acl.principalType === ACL.ROLE) {
                     inRoleTasks.push(function (done) {
-                        Role.isInRole(acl.principalId, context,
-                            function (err, inRole) {
-                                if (!err && inRole) {
-                                    effectiveACLs.push(acl);
-                                }
-                                done(err, acl);
-                            });
+                        Role.isInRole(acl.principalId, context, function (err, inRole) {
+                            if (!err && inRole) {
+                                effectiveACLs.push(acl);
+                            }
+                            done(err, acl);
+                        });
                     });
                 }
             });
 
             async.parallel(inRoleTasks, function (err, results) {
-                if(err) {
+                if (err) {
                     callback && callback(err, null);
                     return;
                 }
                 var resolved = self.resolvePermission(effectiveACLs, req);
-                if(resolved && resolved.permission === ACL.DEFAULT) {
+                if (resolved && resolved.permission === ACL.DEFAULT) {
                     resolved.permission = (model && model.settings.defaultPermission) || ACL.ALLOW;
                 }
                 debug('---Resolved---');

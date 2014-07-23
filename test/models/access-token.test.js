@@ -6,7 +6,7 @@ var assert = require('assert');
 var request = require('supertest');
 var s = require('../support');
 var t = s.t;
-var SEC = require('../../').security;
+var sec = require('../../').security;
 var connectToken = require('sira-connect-token');
 var connectRest = require('sira-connect-rest');
 
@@ -282,9 +282,8 @@ function setupWithTestToken(settings, done) {
 }
 
 function createTestToken(sapp, cb) {
-    sapp.models.AccessToken.create({}, cb);
+    sapp.model('AccessToken').create({}, cb);
 }
-
 
 function createSapp(settings, done) {
     if (typeof settings === 'function') {
@@ -299,8 +298,8 @@ function createSapp(settings, done) {
             {
                 principalType: "ROLE",
                 principalId: "$everyone",
-                accessType: SEC.ALL,
-                permission: SEC.DENY,
+                accessType: sec.ALL,
+                permission: sec.DENY,
                 property: 'deleteById'
             }
         ]};

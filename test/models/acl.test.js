@@ -4,7 +4,7 @@ var sira = require('sira');
 var _ = require('lodash');
 var s = require('./../support');
 var t = s.t;
-var SEC = require('../../').security;
+var sec = require('../../').security;
 
 function checkResult(done) {
     return function (err, result) {
@@ -100,14 +100,14 @@ describe('Security ACLs', function () {
                 name: {
                     type: String,
                     acls: [
-                        {principalType: SEC.USER, principalId: 'u001', accessType: SEC.WRITE, permission: SEC.DENY},
-                        {principalType: SEC.USER, principalId: 'u001', accessType: SEC.ALL, permission: SEC.ALLOW}
+                        {principalType: sec.USER, principalId: 'u001', accessType: sec.WRITE, permission: sec.DENY},
+                        {principalType: sec.USER, principalId: 'u001', accessType: sec.ALL, permission: sec.ALLOW}
                     ]
                 }
             },
             settings: {
                 acls: [
-                    {principalType: SEC.USER, principalId: 'u001', accessType: SEC.ALL, permission: SEC.ALLOW}
+                    {principalType: sec.USER, principalId: 'u001', accessType: sec.ALL, permission: sec.ALLOW}
                 ]
             }
         });

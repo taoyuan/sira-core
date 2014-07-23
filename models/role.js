@@ -3,8 +3,8 @@
 var assert = require('assert');
 var debug = require('debug')('sira:role');
 var async = require('async');
-var SEC = require('../lib/security');
-var AccessContext = require('../lib/access-context').AccessContext;
+var sec = require('../lib/security');
+var AccessContext = require('../lib/accessing').AccessContext;
 
 module.exports = function (Role, app) {
 
@@ -12,11 +12,11 @@ module.exports = function (Role, app) {
     var User = app.model('User');
 
     // Special roles
-    Role.OWNER = SEC.OWNER; // owner of the object
-    Role.RELATED = SEC.RELATED; // any User with a relationship to the object
-    Role.AUTHENTICATED = SEC.AUTHENTICATED; // authenticated user
-    Role.UNAUTHENTICATED = SEC.UNAUTHENTICATED; // authenticated user
-    Role.EVERYONE = SEC.EVERYONE; // everyone
+    Role.OWNER = sec.OWNER; // owner of the object
+    Role.RELATED = sec.RELATED; // any User with a relationship to the object
+    Role.AUTHENTICATED = sec.AUTHENTICATED; // authenticated user
+    Role.UNAUTHENTICATED = sec.UNAUTHENTICATED; // authenticated user
+    Role.EVERYONE = sec.EVERYONE; // everyone
 
     Role.prototype.users = function (callback) {
         RoleMapping.all({where: {roleId: this.id,
@@ -230,14 +230,10 @@ module.exports = function (Role, app) {
         }
 
         this.findOne({where: {name: role}}, function (err, result) {
-            if (err) {
-                callback && callback(err);
-                return;
-            }
-            if (!result) {
-                callback && callback(null, false);
-                return;
-            }
+            if (err) return callback && callback(err);
+
+            if (!result) return callback && callback(null, false);
+
             debug('Role found: %j', result);
 
             // Iterate through the list of principals
@@ -251,8 +247,7 @@ module.exports = function (Role, app) {
                 }
 
                 if (principalType && principalId) {
-                    RoleMapping.findOne({where: {roleId: roleId,
-                            principalType: principalType, principalId: principalId}},
+                    RoleMapping.findOne({where: {roleId: roleId, principalType: principalType, principalId: principalId}},
                         function (err, result) {
                             debug('Role mapping found: %j', result);
                             done(!err && result); // The only arg is the result
@@ -281,7 +276,7 @@ module.exports = function (Role, app) {
         }
         var roles = [];
 
-        var addRole = function (role) {
+        function addRole(role) {
             if (role && roles.indexOf(role) === -1) {
                 roles.push(role);
             }

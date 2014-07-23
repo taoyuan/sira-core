@@ -1,6 +1,6 @@
 "use strict";
 
-var SEC = require('../').security;
+var sec = require('../').security;
 
 module.exports = {
     properties: {
@@ -37,56 +37,56 @@ module.exports = {
     hidden: ['password'],
     acls: [
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.EVERYONE,
-            permission: SEC.DENY
+            principalType: sec.ROLE,
+            principalId: sec.EVERYONE,
+            permission: sec.DENY
         },
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.EVERYONE,
-            permission: SEC.ALLOW,
+            principalType: sec.ROLE,
+            principalId: sec.EVERYONE,
+            permission: sec.ALLOW,
             property: 'create'
         },
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.OWNER,
-            permission: SEC.ALLOW,
+            principalType: sec.ROLE,
+            principalId: sec.OWNER,
+            permission: sec.ALLOW,
             property: 'deleteById'
         },
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.EVERYONE,
-            permission: SEC.ALLOW,
+            principalType: sec.ROLE,
+            principalId: sec.EVERYONE,
+            permission: sec.ALLOW,
             property: "login"
         },
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.EVERYONE,
-            permission: SEC.ALLOW,
+            principalType: sec.ROLE,
+            principalId: sec.EVERYONE,
+            permission: sec.ALLOW,
             property: "logout"
         },
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.OWNER,
-            permission: SEC.ALLOW,
+            principalType: sec.ROLE,
+            principalId: sec.OWNER,
+            permission: sec.ALLOW,
             property: "findById"
         },
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.OWNER,
-            permission: SEC.ALLOW,
+            principalType: sec.ROLE,
+            principalId: sec.OWNER,
+            permission: sec.ALLOW,
             property: "updateById"
         },
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.OWNER,
-            permission: SEC.ALLOW,
+            principalType: sec.ROLE,
+            principalId: sec.OWNER,
+            permission: sec.ALLOW,
             property: "updateAttributes"
         },
         {
-            principalType: SEC.ROLE,
-            principalId: SEC.EVERYONE,
-            permission: SEC.ALLOW,
+            principalType: sec.ROLE,
+            principalId: sec.EVERYONE,
+            permission: sec.ALLOW,
             property: "confirm"
         }
     ]
