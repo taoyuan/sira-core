@@ -2,14 +2,7 @@
 var sira = require('sira');
 var authorizer = require('../../../').authorizer;
 
-module.exports = function (options, cb) {
-    if (typeof options === "function") {
-        cb = options;
-        options = null;
-    }
-    options = options || {};
-    cb = cb || function () {};
-
+module.exports = function (cb) {
     var sapp = sira();
     sapp.phase(sira.boot.module('./'));
     sapp.phase(sira.boot.module(__dirname));
@@ -22,7 +15,7 @@ module.exports = function (options, cb) {
     });
     sapp.phase(authorizer);
 
-    sapp.boot(options, cb);
+    sapp.boot(cb);
     return sapp;
 };
 

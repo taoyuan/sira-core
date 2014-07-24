@@ -12,8 +12,8 @@ describe('Role', function () {
         var User, Role, RoleMapping;
 
         beforeEach(function (done) {
-            s.bootApp(function (err, _app) {
-                app = _app;
+            app = s.sapp();
+            app.boot(function (err) {
                 User = app.models.User;
                 Role = app.models.Role;
                 RoleMapping = app.models.RoleMapping;
@@ -22,7 +22,7 @@ describe('Role', function () {
         });
 
         afterEach(function (done) {
-            s.destroyAll([User, Role, RoleMapping], done);
+            s.cleanup(app, done);
         });
 
         it("should define role/role relations", function (done) {
@@ -185,13 +185,7 @@ describe('Role', function () {
         var User, Role, ACL, Album;
 
         beforeEach(function (done) {
-            app = s.bootApp(function (err) {
-                User = app.model('User');
-                Role = app.model('Role');
-                ACL = app.model('ACL');
-                Album = app.model('Album');
-                done(err);
-            });
+            app = s.sapp();
             app.registry.define('Album', {
                 properties: {
                     name: String,
@@ -205,10 +199,17 @@ describe('Role', function () {
                     }
                 }
             });
+            app.boot(function (err) {
+                User = app.model('User');
+                Role = app.model('Role');
+                ACL = app.model('ACL');
+                Album = app.model('Album');
+                done(err);
+            });
         });
 
         afterEach(function (done) {
-            s.destroyAll([User, Role, ACL, Album], done);
+            s.cleanup(app, done);
         });
 
         it("should support owner role resolver", function (done) {

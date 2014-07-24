@@ -14,10 +14,8 @@ describe('User', function () {
     var app;
 
     beforeEach(function (done) {
-        s.bootApp(function (err, _app) {
-            app = _app;
-            done(err);
-        })
+        app = s.sapp();
+        app.boot(done);
     });
 
     beforeEach(function (done) {
@@ -27,10 +25,7 @@ describe('User', function () {
     });
 
     afterEach(function (done) {
-        async.series([
-            User.destroyAll.bind(User),
-            AccessToken.destroyAll.bind(AccessToken)
-        ], done);
+        s.cleanup(app, done);
     });
 
     it('should extends Timable', function (done) {

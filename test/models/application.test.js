@@ -6,13 +6,18 @@ var t = s.t;
 describe('Application', function () {
     var registeredApp = null;
 
-    var Application;
+    var sapp, Application;
 
     beforeEach(function (done) {
-        s.bootApp(function (err, app) {
-            Application = app.models.Application;
+        sapp = s.sapp();
+        sapp.boot(function (err) {
+            Application = sapp.models.Application;
             done(err);
         })
+    });
+
+    afterEach(function (done) {
+        s.cleanup(sapp, done);
     });
 
     it('Create a new application', function (done) {

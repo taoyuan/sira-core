@@ -19,7 +19,9 @@ describe('Security Scopes', function () {
     var testModel;
 
     beforeEach(function (done) {
-        app = s.bootApp(function () {
+        app = s.sapp();
+        app.registry.define('testModel');
+        app.boot(function () {
             ACL = app.model('ACL');
             Role = app.model('Role');
             RoleMapping = app.model('RoleMapping');
@@ -28,11 +30,11 @@ describe('Security Scopes', function () {
             testModel = app.model('testModel');
             done();
         });
-        app.registry.define('testModel');
+
     });
 
     afterEach(function (done) {
-        s.destroyAll([ACL, Role, RoleMapping, User, Scope, testModel], done);
+        s.cleanup(app, done);
     });
 
     it("should allow access to models for the given scope by wildcard", function (done) {
@@ -85,15 +87,7 @@ describe('Security ACLs', function () {
     var app;
     var ACL, Role, RoleMapping, User, Scope, Customer;
     beforeEach(function (done) {
-        app = s.bootApp(function () {
-            ACL = app.model('ACL');
-            Role = app.model('Role');
-            RoleMapping = app.model('RoleMapping');
-            User = app.model('User');
-            Scope = app.model('Scope');
-            Customer = app.model('Customer');
-            done();
-        });
+        app = s.sapp();
 
         app.registry.define('Customer', {
             properties: {
@@ -111,10 +105,20 @@ describe('Security ACLs', function () {
                 ]
             }
         });
+
+        app.boot(function () {
+            ACL = app.model('ACL');
+            Role = app.model('Role');
+            RoleMapping = app.model('RoleMapping');
+            User = app.model('User');
+            Scope = app.model('Scope');
+            Customer = app.model('Customer');
+            done();
+        });
     });
 
     afterEach(function (done) {
-        s.destroyAll([ACL, Role, RoleMapping, User, Scope, Customer], done);
+        s.cleanup(app, done);
     });
 
 

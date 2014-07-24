@@ -121,7 +121,7 @@ describe('AccessToken', function () {
 
 
 describe('authorize/direct', function () {
-    this.timeout(0);
+    this.enableTimeouts(false);
 
     it('prevents call with 401 status on denied ACL', function (done) {
         setupWithTestToken.call(this, function (err) {
@@ -173,7 +173,7 @@ describe('authorize/direct', function () {
 });
 
 describe('authorize/rest', function () {
-    this.timeout(0);
+    this.enableTimeouts(false);
 
     it('prevents remote call with 401 status on denied ACL', function (done) {
         setupWithTestToken.call(this, function () {
@@ -292,6 +292,8 @@ function createSapp(settings, done) {
     }
     settings = settings || {};
 
+    var sapp = s.sapp(settings.app || settings.sapp);
+
     var modelOptions = {
         crud: true,
         acls: [
@@ -304,12 +306,11 @@ function createSapp(settings, done) {
             }
         ]};
     _.assign(modelOptions, settings.model);
-    var appOptions = {
-        beforeBoot: function (sapp) {
-            sapp.registry.define('test', modelOptions);
-        }
-    };
-    _.assign(appOptions, settings.app || settings.sapp);
 
-    s.bootAppSync(appOptions, done);
+    sapp.registry.define('test', modelOptions);
+
+    sapp.boot(function (err) {
+        done(err, sapp);
+    });
+
 }
