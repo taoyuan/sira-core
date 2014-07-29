@@ -91,7 +91,7 @@ module.exports = function (User, app) {
                     } else if (isMatch) {
                         user.createAccessToken(credentials.ttl, function (err, token) {
                             if (err) return cb(err);
-                            token.__data.user = user;
+                            token.__cachedRelations.user = user;
                             cb(err, token);
                         });
                     } else {
