@@ -2,7 +2,7 @@
 
 var async = require('async');
 var assert = require('assert');
-var debug = require('debug')('sira:security:acl');
+var debug = require('debug2')('sira:security:acl');
 
 var sec = require('../lib/security');
 var accessing = require('../lib/accessing');

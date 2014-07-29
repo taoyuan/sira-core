@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var debug = require('debug')('sira:role');
+var debug = require('debug2')('sira:role');
 var async = require('async');
 var sec = require('../lib/security');
 var AccessContext = require('../lib/accessing').AccessContext;

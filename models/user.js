@@ -1,6 +1,6 @@
 "use strict";
 
-var debug = require('debug')('sira-core:user');
+var debug = require('debug2')('sira-core:user');
 var validator = require('validator');
 var bcrypt = require('bcryptjs');
 
