@@ -4,6 +4,7 @@ var sec = require('../').security;
 
 module.exports = {
     properties: {
+        id: {type: String, index: true},
         realm: {type: String},
         username: {type: String, index: true},
         email: {type: String, index: true},
