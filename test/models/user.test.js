@@ -3,12 +3,11 @@
 var sira = require('sira');
 var s = require('./../support');
 var t = s.t;
-var async = require('async');
 
 describe('User', function () {
     var validCredentials = {email: 'foo@bar.com', password: 'bar'};
     var validCredentialsWithTTL = {email: 'foo@bar.com', password: 'bar', ttl: 3600};
-    var invalidCredentials = {email: 'foo1@bar.com', password: 'bar1'};
+//    var invalidCredentials = {email: 'foo1@bar.com', password: 'bar1'};
 
     var User, AccessToken;
     var app;
@@ -26,26 +25,6 @@ describe('User', function () {
 
     afterEach(function (done) {
         s.cleanup(app, done);
-    });
-
-    it('should extends Timable', function (done) {
-        var user;
-        async.series([
-            function (callback) {
-                User.findOne({ where: {email: validCredentials.email }}, function (err, model) {
-                    user = model;
-                    t(user.created);
-                    t(user.updated);
-                    callback(err);
-                });
-            },
-            function (callback) {
-                user.updateAttribute('status', 'online', function (err, user) {
-                    t(user.updated >= user.created);
-                    callback(err);
-                });
-            }
-        ], done);
     });
 
     describe('User.create', function () {
