@@ -37,9 +37,9 @@ describe('User', function () {
             });
         });
 
-        it('Email can be blank', function (done) {
+        it('Email can not be blank', function (done) {
             User.create({password: '123'}, function (err) {
-                t(!err);
+                t.ok(err);
                 done();
             });
         });
