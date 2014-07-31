@@ -46,18 +46,13 @@ module.exports = function (AccessToken) {
         });
     });
 
-
     /**
-     * Find a token for the given `ServerRequest`.
+     * Find and validate a token for the given `id`.
      *
-     * @param {object} req
-     * @param {Object} [options] Options for finding the token
+     * @param {String} id
      * @param {Function} cb (err, token)
      */
-
-    AccessToken.findForRequest = function (req, options, cb) {
-        var id = tokenIdForRequest(req, options);
-
+    AccessToken.findForId = function (id, cb) {
         if (id) {
             this.findById(id, function (err, token) {
                 if (err) return cb(err);
@@ -82,7 +77,6 @@ module.exports = function (AccessToken) {
      *
      * @callback {Function} cb (err, isValid)
      */
-
     AccessToken.prototype.validate = function (cb) {
         try {
             assert(this.created && typeof this.created.getTime === 'function', 'token.created must be a valid Date');
@@ -108,51 +102,4 @@ module.exports = function (AccessToken) {
         }
     };
 
-    function tokenIdForRequest(req, options) {
-        var params = options.params || [];
-        var headers = options.headers || [];
-        var cookies = options.cookies || [];
-        var i = 0;
-        var length;
-        var id;
-
-        params = params.concat(['access_token']);
-        headers = headers.concat(['X-Access-Token', 'authorization']);
-        cookies = cookies.concat(['access_token', 'authorization']);
-
-        for (length = params.length; i < length; i++) {
-            id = req.param(params[i]);
-
-            if (typeof id === 'string') {
-                return id;
-            }
-        }
-
-        for (i = 0, length = headers.length; i < length; i++) {
-            id = req.header(headers[i]);
-
-            if (typeof id === 'string') {
-                // Add support for oAuth 2.0 bearer token
-                // http://tools.ietf.org/html/rfc6750
-                if (id.indexOf('Bearer ') === 0) {
-                    id = id.substring(7);
-                    // Decode from base64
-                    var buf = new Buffer(id, 'base64');
-                    id = buf.toString('utf8');
-                }
-                return id;
-            }
-        }
-
-        if (req.signedCookies) {
-            for (i = 0, length = cookies.length; i < length; i++) {
-                id = req.signedCookies[cookies[i]];
-
-                if (typeof id === 'string') {
-                    return id;
-                }
-            }
-        }
-        return null;
-    }
 };
