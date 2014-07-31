@@ -123,7 +123,7 @@ module.exports = function (Role, app) {
                 return;
             }
             debug('Model found: %j', inst);
-            var ownerId = inst.userId || inst.owner;
+            var ownerId = inst.userId || inst.ownerId || inst.owner;
             if (ownerId) {
                 callback && callback(null, matches(ownerId, userId));
             } else {
