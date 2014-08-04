@@ -7,7 +7,7 @@ var request = require('supertest');
 var s = require('../support');
 var t = s.t;
 var sec = require('../../').security;
-var connectToken = require('sira-connect-token');
+var veriuser = require('../../').veriuser;
 var connectRest = require('sira-connect-rest');
 
 describe('token(options)', function () {
@@ -81,7 +81,7 @@ describe('token(options)', function () {
             req.accessToken = tokenStub;
             next();
         });
-        app.use(connectToken(sapp));
+        app.use(veriuser(sapp));
         app.get('/', function (req, res, next) {
             res.send(req.accessToken);
         });
@@ -237,7 +237,7 @@ function createTestApp(sapp, token, settings, done) {
     var app = express();
 
     app.use(cookieParser('secret'));
-    app.use(connectToken(sapp));
+    app.use(veriuser(sapp));
 
     app.get('/token', function (req, res) {
         res.cookie('authorization', token.id, {signed: true});
