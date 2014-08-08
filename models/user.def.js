@@ -3,6 +3,7 @@
 var sec = require('../').security;
 
 module.exports = {
+    hidden: ['password'],
     properties: {
         id: {type: String, index: true},
         realm: {type: String},
@@ -11,22 +12,10 @@ module.exports = {
         password: {type: String},
         emailVerified: Boolean,
         verificationToken: String,
-
-        credentials: [
-            'UserCredential' // User credentials, private or public, such as private/public keys, Kerberos tickets, oAuth tokens, facebook, google, github ids
-        ],
-        challenges: [
-            'Challenge' // Security questions/answers
-        ],
         status: String,
-
         // Timestamps
-        created: {type: Date, default: function () {
-            return new Date;
-        }},
-        updated: {type: Date, default: function () {
-            return new Date;
-        }}
+        created: {type: Date, default: function () { return new Date; }},
+        updated: {type: Date, default: function () { return new Date; }}
     },
     relations: {
         accessTokens: {
@@ -35,7 +24,6 @@ module.exports = {
             foreignKey: 'userId'
         }
     },
-    hidden: ['password'],
     acls: [
         {
             principalType: sec.ROLE,
