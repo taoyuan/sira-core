@@ -8,7 +8,7 @@ var s = require('../support');
 var t = s.t;
 var sec = require('../../').security;
 var veriuser = require('../../').veriuser;
-var connectRest = require('sira-connect-rest');
+var connectRest = require('sira-rest');
 
 describe('token(options)', function () {
     beforeEach(setupWithTestToken);
