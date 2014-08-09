@@ -285,7 +285,7 @@ module.exports = function (ACL, app) {
      *  @param {String|Model} context.model The model name or model class.
      *  @param {*} context.id The model instance ID.
      *  @param {String} context.property The property/method/relation name.
-     *  @param {String} context.accessType The access type: READE, WRITE, or EXEC.
+     *  @param {String} context.accessType The access type: READE, WRITE, or EXECUTE.
      * @param {Function} callback Callback function
      */
     ACL.checkAccessForContext = function (context, callback) {
