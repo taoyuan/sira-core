@@ -100,6 +100,19 @@ describe('access control - integration', function () {
     });
 
     describe('accounts', function () {
+        var count = 0;
+        before(function() {
+            var Role = this.sapp.models.Role;
+            Role.registerResolver('$dummy', function (role, context, callback) {
+                process.nextTick(function () {
+                    if(context.remoteContext) {
+                        count++;
+                    }
+                    callback && callback(null, false); // Always true
+                });
+            });
+        });
+
         st.beforeEach.givenModel('account');
 
         st.it.shouldBeDeniedWhenCalledAnonymously('accounts.all');

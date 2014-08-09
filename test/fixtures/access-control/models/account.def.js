@@ -31,6 +31,13 @@ module.exports = {
             "principalType": "ROLE",
             "principalId": "$owner",
             "property": "deleteById"
+        },
+        {
+            "accessType": "*",
+            "permission": "DENY",
+            "property": "find",
+            "principalType": "ROLE",
+            "principalId": "$dummy"
         }
     ],
     "public": true
