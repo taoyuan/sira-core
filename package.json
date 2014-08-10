@@ -23,7 +23,8 @@
     "debug": "^1.0.4",
     "lodash": "^2.4.1",
     "uid2": "0.0.3",
-    "validator": "^3.16.0"
+    "validator": "^3.16.0",
+    "veritoken": "taoyuan/veritoken"
   },
   "devDependencies": {
     "chai": "^1.9.1",
