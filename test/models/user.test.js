@@ -137,9 +137,9 @@ describe('User', function () {
         it('Logout a user by providing the current accessToken id (over handler)', function(done) {
             login(logout);
             function login(fn) {
-                sira.rekuest('user.login')
+                app.rekuest('user.login')
                     .payload({email: 'foo@bar.com', password: 'bar'})
-                    .send(app, function (err, accessToken) {
+                    .send(function (err, accessToken) {
                         if(err) return done(err);
 
                         t(accessToken.userId);
@@ -150,9 +150,9 @@ describe('User', function () {
             }
 
             function logout(err, token) {
-                sira.rekuest('user.logout')
+                app.rekuest('user.logout')
                     .prop('accessToken', token)
-                    .send(app, verify(token.id, done));
+                    .send(verify(token.id, done));
             }
         });
 

@@ -126,9 +126,9 @@ describe('authorize/direct', function () {
     it('prevents call with 401 status on denied ACL', function (done) {
         setupWithTestToken.call(this, function (err) {
             if (err) return done(err);
-            sira.rekuest('test.deleteById', {id: 123})
+            this.sapp.rekuest('test.deleteById', {id: 123})
                 .prop('accessToken', this.token)
-                .send(this.sapp, function (err, result) {
+                .send(function (err, result) {
                     t.equal(err.statusCode, 401);
                     done();
                 });
@@ -138,9 +138,9 @@ describe('authorize/direct', function () {
     it('prevent call with app setting status on denied ACL', function (done) {
         setupWithTestToken.call(this, {app: {aclErrorStatus: 403}}, function (err) {
             if (err) return done(err);
-            sira.rekuest('test.deleteById', {id: 123})
+            this.sapp.rekuest('test.deleteById', {id: 123})
                 .prop('accessToken', this.token)
-                .send(this.sapp, function (err) {
+                .send(function (err) {
                     t.equal(err.statusCode, 403);
                     done();
                 });
@@ -150,9 +150,9 @@ describe('authorize/direct', function () {
     it('prevent call with model setting status on denied ACL', function (done) {
         setupWithTestToken.call(this, {model: {aclErrorStatus: 404}}, function (err) {
             if (err) return done(err);
-            sira.rekuest('test.deleteById', {id: 123})
+            this.sapp.rekuest('test.deleteById', {id: 123})
                 .prop('accessToken', this.token)
-                .send(this.sapp, function (err) {
+                .send(function (err) {
                     t.equal(err.statusCode, 404);
                     done();
                 });
@@ -162,8 +162,8 @@ describe('authorize/direct', function () {
     it('prevent call if the accessToken is missing and required', function (done) {
         setupWithTestToken.call(this, function (err) {
             if (err) return done(err);
-            sira.rekuest('test.deleteById', {id: 123})
-                .send(this.sapp, function (err) {
+            this.sapp.rekuest('test.deleteById', {id: 123})
+                .send(function (err) {
                     t.equal(err.statusCode, 401);
                     done();
                 });
