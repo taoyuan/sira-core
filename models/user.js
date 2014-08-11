@@ -59,11 +59,19 @@ module.exports = function (User, app) {
      * ```
      *
      * @param {Object} credentials
+     * @param {String} [include] `user`
      * @param {Function} cb (err, token)
      */
 
-    User.login = function (credentials, cb) {
+    User.login = function (credentials, include, cb) {
         var self = this;
+
+        if (typeof include === 'function') {
+            cb = include;
+            include = null;
+        }
+
+        include = (include || '').toLowerCase();
 
         var query = {};
         if (credentials.email) {
@@ -91,7 +99,14 @@ module.exports = function (User, app) {
                     } else if (isMatch) {
                         user.createAccessToken(credentials.ttl, function (err, token) {
                             if (err) return cb(err);
-                            token.__cachedRelations.user = user;
+                            if (include === 'user') {
+                                // NOTE We can't set token.user here:
+                                //  1. token.user already exists, it's a function injected by
+                                //     "AccessToken belongsTo User" relation
+                                //  2. Model.toJSON() ignores own properties, thus
+                                //     the value won't be included in the HTTP response
+                                token.__cachedRelations.user = user;
+                            }
                             cb(err, token);
                         });
                     } else {
@@ -192,10 +207,16 @@ module.exports = function (User, app) {
 
     User.expose('login', {
         accepts: [
-            {arg: 'credentials', type: 'object', required: true, source: 'body'}
+            {arg: 'credentials', type: 'object', required: true, source: 'body'},
+            {arg: 'include', type: 'string', description: 'Related objects to include in the response. ' +
+                'See the description of return value for more details.'}
         ],
         returns: {
-            arg: 'accessToken', type: 'object', root: true, description: 'The result AccessToken created on login.\n\n'
+            arg: 'accessToken', type: 'object', root: true, description:
+                'The response body contains properties of the AccessToken created on login.\n' +
+                'Depending on the value of `include` parameter, the body may contain ' +
+                'additional properties:\n\n' +
+                '  - `user` - `{User}` - Data of the currently logged in user. (`include=user`)\n\n'
         },
         http: {verb: 'post'}
     });
