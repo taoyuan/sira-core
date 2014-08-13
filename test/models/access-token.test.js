@@ -7,7 +7,7 @@ var request = require('supertest');
 var s = require('../support');
 var t = s.t;
 var sec = require('../../').security;
-var veriuser = require('../../').veriuser;
+var veriuser = require('sira-express-veriuser');
 var connectRest = require('sira-express-rest');
 
 describe('token(options)', function () {
