@@ -4,6 +4,7 @@ var sec = require('../').security;
 
 module.exports = {
     hidden: ['password'],
+    uuid: 'v4',
     properties: {
         id: {type: String, index: true},
         realm: {type: String},

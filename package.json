@@ -1,10 +1,10 @@
 {
   "name": "sira-core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "sira-core =========",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha test/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -31,7 +31,7 @@
     "cookie-parser": "^1.3.2",
     "express": "^4.6.1",
     "jugglingdb": "^0.2.14",
-    "jugglingdb-redis-hq": "0.0.10",
+    "jugglingdb-redis-hq": "latest",
     "mocha": "^1.20.1",
     "sira": "taoyuan/sira",
     "sira-express-rest": "taoyuan/sira-express-rest",

@@ -45,7 +45,10 @@ module.exports = function (User, app) {
         ttl = Math.min(ttl || Clazz.settings.ttl, Clazz.settings.maxTTL);
         this.accessTokens.create({
             ttl: ttl
-        }, cb);
+        }, function (err, data) {
+            cb && cb(err, data);
+        });
+
     };
 
 

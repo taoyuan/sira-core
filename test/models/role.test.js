@@ -21,6 +21,10 @@ describe('Role', function () {
             })
         });
 
+        beforeEach(function (done) {
+            s.cleanup(app, done);
+        });
+
         afterEach(function (done) {
             s.cleanup(app, done);
         });
@@ -57,7 +61,8 @@ describe('Role', function () {
         it("should define role/user relations", function (done) {
 
             User.create({name: 'Raymond', email: 'x@y.com', password: 'foobar'}, function (err, user) {
-                // console.log('User: ', user.id);
+//                console.log('User: ', user.id);
+                t(user.id);
                 Role.create({name: 'userRole'}, function (err, role) {
                     role.principals.create({principalType: RoleMapping.USER, principalId: user.id}, function (err, p) {
                         var check = t.plan(3, done);
@@ -91,7 +96,8 @@ describe('Role', function () {
         it("should automatically generate role id", function (done) {
 
             User.create({name: 'Raymond', email: 'x@y.com', password: 'foobar'}, function (err, user) {
-                // console.log('User: ', user.id);
+//                console.log('User: ', user.id);
+                t(user.id);
                 Role.create({name: 'userRole'}, function (err, role) {
                     t(role.id);
                     role.principals.create({principalType: RoleMapping.USER, principalId: user.id}, function (err, p) {
@@ -127,24 +133,26 @@ describe('Role', function () {
 
         it("should support getRoles() and isInRole()", function (done) {
             User.create({name: 'Raymond', email: 'x@y.com', password: 'foobar'}, function (err, user) {
-                // console.log('User: ', user.id);
+//                console.log('User: ', user.id);
+                t(user.id);
                 Role.create({name: 'userRole'}, function (err, role) {
                     role.principals.create({principalType: RoleMapping.USER, principalId: user.id}, function (err, p) {
                         var check = t.plan(7, done);
-                        // Role.find(console.log);
-                        // role.principals(console.log);
                         Role.isInRole('userRole', {principalType: RoleMapping.USER, principalId: user.id}, function (err, exists) {
-                            t(!err && exists === true);
+                            t.notOk(err);
+                            t.ok(exists);
                             check();
                         });
 
                         Role.isInRole('userRole', {principalType: RoleMapping.APP, principalId: user.id}, function (err, exists) {
-                            t(!err && exists === false);
+                            t.notOk(err);
+                            t.notOk(exists);
                             check();
                         });
 
                         Role.isInRole('userRole', {principalType: RoleMapping.USER, principalId: 100}, function (err, exists) {
-                            t(!err && exists === false);
+                            t.notOk(err);
+                            t.notOk(exists);
                             check();
                         });
 
@@ -189,7 +197,7 @@ describe('Role', function () {
             app.registry.define('Album', {
                 properties: {
                     name: String,
-                    userId: Number
+                    userId: String
                 },
                 relations: {
                     user: {

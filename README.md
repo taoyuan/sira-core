@@ -1,4 +1,3 @@
 sira-core
 =========
-
-Sira core.
+> Sira core module.
